@@ -1,0 +1,50 @@
+{% extends 'index.html.twig' %}
+
+{% block body %}
+    <div class="game-container">
+        <h1 class="game-container__title"></h1>
+        <div class="game-container__options">
+
+        </div>
+        <div class="">
+            <button class="game-container__button" id="game-container-btn-next">Next</button>
+            <button class="game-container__button" id="game-container-btb-prev">Previous</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        $(document).ready(function (e) {
+        	var $game = {{ game.toArray|json_encode|raw }};
+            var $currQuestion = 0;
+            var $title = $('.game-container__title');
+            var $optionsContainer = $('.game-container__options');
+            var score = 0;
+
+        	function showQuestion()
+            {
+            	var question = $game.questions[$currQuestion];
+                $title.html($question.title);
+                $.forEach(question.options, function (i, e) {
+                	$optionsContainer.append(
+                		$('<input type="radio">')
+                            .html(e.text)
+                            .attr('isCorrect', e.isCorrect)
+                            .click(function (e) {
+                            	e.preventDefault();
+                            	var $radio = $(this);
+                            	if ($radio.data('isCorrect')) {
+                            		score++;
+                                }
+                                $currQuestion++;
+                            	showQuestion();
+                            })
+                    );
+                });
+            }
+
+            showQuestion();
+        });
+    </script>
+{% endblock %}

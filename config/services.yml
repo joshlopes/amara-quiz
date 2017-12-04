@@ -1,0 +1,47 @@
+parameters:
+  logging_level: !php/const:Monolog\Logger::INFO
+
+services:
+  logger:
+    class: Monolog\Logger
+    arguments:
+      - 'handler'
+    calls:
+      - [pushHandler, ['@logging.handler']]
+
+  logging.formatter:
+    class: Monolog\Formatter\LineFormatter
+    public: false
+    arguments:
+      - '%%message%% %%context%% %%extra%%'
+
+  logging.handler:
+    class: Monolog\Handler\StreamHandler
+    public: false
+    arguments:
+      - 'php://stderr'
+      - '%logging_level%'
+    calls:
+      - [setFormatter, ['@logging.formatter']]
+
+  app.quiz.quiz_manager:
+    class: LuisLopes\AmaraQuiz\Quiz\QuizManager
+    arguments:
+      - './config/questions.yml'
+
+  app.template.loader:
+    class: Twig_Loader_Filesystem
+    arguments:
+      - './src/app/resources/views'
+
+  app.templating:
+    class: Twig_Environment
+    arguments:
+      - '@app.template.loader'
+
+# Define your own handlers and other services here
+  handler.quiz:
+    class: LuisLopes\AmaraQuiz\Quiz\QuizHandler
+    arguments:
+      - '@app.templating'
+      - '@app.quiz.quiz_manager'
