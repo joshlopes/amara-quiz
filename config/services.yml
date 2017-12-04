@@ -1,3 +1,6 @@
+imports:
+    - { resource: parameters.yml }
+
 parameters:
   logging_level: !php/const:Monolog\Logger::INFO
 
@@ -24,10 +27,23 @@ services:
     calls:
       - [setFormatter, ['@logging.formatter']]
 
+  app.guzzle_client:
+    class: GuzzleHttp\Client
+
   app.quiz.quiz_manager:
     class: LuisLopes\AmaraQuiz\Quiz\QuizManager
     arguments:
+      - '@app.quiz.provider.open_trivia_provider'
+
+  app.quiz.provider.local_provider:
+    class: LuisLopes\AmaraQuiz\Quiz\Provider\LocalProvider
+    arguments:
       - './config/questions.yml'
+
+  app.quiz.provider.open_trivia_provider:
+    class: LuisLopes\AmaraQuiz\Quiz\Provider\OpenTriviaProvider
+    arguments:
+      - '@app.guzzle_client'
 
   app.template.loader:
     class: Twig_Loader_Filesystem
@@ -39,9 +55,21 @@ services:
     arguments:
       - '@app.template.loader'
 
-# Define your own handlers and other services here
+  app.slack.slack_client:
+    class: LuisLopes\AmaraQuiz\Bridge\Slack\SlackClient
+    arguments:
+      - '@app.guzzle_client'
+      - '%slack_hook%'
+
+  # Define your own handlers and other services here
   handler.quiz:
     class: LuisLopes\AmaraQuiz\Quiz\QuizHandler
     arguments:
       - '@app.templating'
       - '@app.quiz.quiz_manager'
+
+  handler.quiz_complete:
+    class: LuisLopes\AmaraQuiz\Quiz\QuizCompleteHandler
+    arguments:
+      - '@app.templating'
+      - '@app.slack.slack_client'

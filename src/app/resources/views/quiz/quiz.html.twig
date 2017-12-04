@@ -1,14 +1,56 @@
 {% extends 'index.html.twig' %}
 
-{% block body %}
-    <div class="game-container">
-        <h1 class="game-container__title"></h1>
-        <div class="game-container__options">
+{% block bodyClass %}snow{% endblock %}
 
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="https://s3.amazonaws.com/php-amara-quiz-prod-serverlessdeploymentbucket-1pvchvo3f5i78/public/css/santa-circle.css">
+{% endblock %}
+
+{% block body %}
+    <div class="row login-panel" style="margin-top: 100px">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="santa">
+                        <div class="circles"></div>
+                        <div class="snow"></div>
+                        <div class="hat">
+                            <div class="hat-end"></div>
+                        </div>
+                        <div class="face">
+                            <div class="eyes"></div>
+                            <div class="mouth"></div>
+                        </div>
+                        <div class="dirty-overflow">
+                            <div class="body"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Welcome to our very easy and friendly quiz. Do your best and you may win a cookie!</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Your name" id="username">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-warning" id="quiz-start-btn">Let's do it!</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="">
-            <button class="game-container__button" id="game-container-btn-next">Next</button>
-            <button class="game-container__button" id="game-container-btb-prev">Previous</button>
+    </div>
+    <div class="row hidden game-panel" style="margin-top: 100px">
+        <div class="col-lg-12">
+            <div class="game-container">
+                <h1 class="game-container__title"></h1>
+                <div class="game-container__options">
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -21,30 +63,65 @@
             var $title = $('.game-container__title');
             var $optionsContainer = $('.game-container__options');
             var score = 0;
+            var name = '';
 
+            // Start the quiz by adding a name
+            $('#quiz-start-btn').click(function(e) {
+            	name = $('#username').val();
+            	if (!name) {
+            		alert('Make your self known to enter!');
+
+            		return;
+                }
+
+                $('.game-panel').removeClass('hidden');
+            	$('.login-panel').addClass('hidden');
+
+            	// show the first question
+	            showQuestion();
+            });
+
+            // Show the results
+            function showResults()
+            {
+                window.location = '/prod/quiz/complete?username=' + name + "&score=" + score;
+            }
+
+            // Show a question based on the currQuestion (idx0)
         	function showQuestion()
             {
+            	if ($currQuestion === $game.questions.length) {
+            		// we got the end - hurray
+            		showResults();
+            		return;
+                }
+
+                // grab the current question and displays it
             	var question = $game.questions[$currQuestion];
-                $title.html($question.title);
-                $.forEach(question.options, function (i, e) {
+                $title.html(question.title);
+	            $optionsContainer.empty();
+                $(question.options).each(function (i, el) {
+                	// append all options to the options container
                 	$optionsContainer.append(
-                		$('<input type="radio">')
-                            .html(e.text)
-                            .attr('isCorrect', e.isCorrect)
-                            .click(function (e) {
-                            	e.preventDefault();
-                            	var $radio = $(this);
-                            	if ($radio.data('isCorrect')) {
-                            		score++;
-                                }
-                                $currQuestion++;
-                            	showQuestion();
-                            })
+                		$('<div/>')
+                            .append(
+	                            $('<input type="radio" />')
+		                            .data('isCorrect', (el.isCorrect ? 'true' : 'false'))
+		                            .click(function (e) {
+			                            e.preventDefault();
+			                            var $radio = $(this);
+			                            if ('true' === $radio.data('isCorrect').toString()) {
+				                            score++;
+			                            }
+			                            $currQuestion++;
+			                            showQuestion();
+		                            }),
+                                el.text,
+                                $('<br/>')
+                            )
                     );
                 });
             }
-
-            showQuestion();
         });
     </script>
 {% endblock %}

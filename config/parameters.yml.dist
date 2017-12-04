@@ -1,0 +1,2 @@
+parameters:
+    slack_hook: https://hooks.slack.com/services/xxxxxx/xxxx/xxxxxxxx

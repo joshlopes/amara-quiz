@@ -23,12 +23,18 @@ class QuizHandler
         $this->quizManager = $quizManager;
     }
 
-    public function handle(array $event, Context $context)
+    public function handle(array $event, Context $context): array
     {
         $logger = $context->getLogger();
         $logger->notice('Got event', $event);
 
-        return $this->twig->render('quiz/quiz.html.twig', ['game' => $this->quizManager->createGame()]);
+        return [
+            'statusCode' => 200,
+            'headers' => [
+                'Content-Type' => 'text/html',
+            ],
+            'body' => $this->twig->render('quiz/quiz.html.twig', ['game' => $this->quizManager->createGame()]),
+        ];
     }
 
 }

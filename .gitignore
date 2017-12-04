@@ -1,6 +1,7 @@
 # PHP
 /vendor/
 .php_cs.cache
+/config/parameters.yml
 
 # Serverless directories
 .serverless

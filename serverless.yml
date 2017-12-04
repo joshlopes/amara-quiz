@@ -20,6 +20,7 @@ service: php-amara-quiz # NOTE: update this with your service name
 provider:
   name: aws
   runtime: nodejs6.10
+  stage: prod
   profile: serverless
 
 # you can overwrite defaults here
@@ -46,18 +47,11 @@ provider:
 #  environment:
 #    variable1: value1
 
-# you can add packaging information here
-#package:
-#  include:
-#    - include-me.js
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.js
-#    - exclude-me-dir/**
 package:
   exclude:
     - '*'
     - '**'
+    - tests/**
   include:
     - config/**
     - handler.js
@@ -73,8 +67,16 @@ functions:
       HANDLER: handler.quiz  # This is the service name which will be used (from services.yml)
     events:
       - http:
-          path: hello
+          path: quiz
           method: get
+  quiz_complete:
+      handler: handler.handle
+      environment:
+        HANDLER: handler.quiz_complete  # This is the service name which will be used (from services.yml)
+      events:
+        - http:
+            path: quiz/complete
+            method: get
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

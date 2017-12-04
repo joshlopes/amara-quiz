@@ -38,4 +38,9 @@ class Game
 
         return $game;
     }
+
+    public function getQuestions(): array
+    {
+        return $this->questions;
+    }
 }

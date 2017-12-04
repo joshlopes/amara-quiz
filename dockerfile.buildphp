@@ -37,6 +37,7 @@ RUN ./configure \
     --enable-phar \
     --enable-soap \
     --enable-xml \
+    --enable-hash \
     --with-curl \
     --with-gd \
     --with-zlib \

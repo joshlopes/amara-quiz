@@ -3,9 +3,13 @@
   "description": "Amara quiz",
   "type": "project",
   "autoload": {
+    "exclude-from-classmap": ["/Tests/", "/test/", "/tests/"],
     "psr-4": {
       "LuisLopes\\AmaraQuiz\\": "src"
     }
+  },
+  "autoload-dev": {
+    "psr-4": { "LuisLopes\\AmaraQuiz\\Tests\\": "tests" }
   },
   "require": {
     "monolog/monolog": "^1.22",
@@ -14,8 +18,10 @@
     "symfony/config": "^3.2",
     "symfony/dependency-injection": "^3.2",
     "symfony/yaml": "^3.2",
-    "twig/twig": "^2.4"
+    "twig/twig": "^2.4",
+    "guzzlehttp/guzzle": "^6.3"
   },
   "require-dev": {
+    "phpunit/phpunit": "6.5"
   }
 }

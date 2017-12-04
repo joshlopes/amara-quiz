@@ -34,9 +34,7 @@ class Question
     public function toArray(): array
     {
         $options = [];
-        $randomedOptions = $this->options;
-        shuffle($randomedOptions);
-        foreach ($randomedOptions as $option)
+        foreach ($this->options as $option)
         {
             $options[] = $option->toArray();
         }

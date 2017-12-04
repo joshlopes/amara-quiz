@@ -2,42 +2,23 @@
 
 namespace LuisLopes\AmaraQuiz\Quiz;
 
-use Symfony\Component\Yaml\Yaml;
+use LuisLopes\AmaraQuiz\Quiz\Provider\QuizProviderInterface;
 
 class QuizManager
 {
     /**
-     * @var array
+     * @var QuizProviderInterface
      */
-    private $questions;
+    private $quizProvider;
 
-    public function __construct(string $file)
+    public function __construct(QuizProviderInterface $quizProvider)
     {
-        $this->questions = Yaml::parseFile($file);
+        $this->quizProvider = $quizProvider;
     }
 
-    public function createGame($questions = 10): Game
+    public function createGame($numberQuestions = 10)
     {
-        $game = new Game();
-        $randomQuestions = $this->questions;
-        shuffle($randomQuestions);
-        $numQuestions = 0;
-        foreach ($randomQuestions as $question) {
-            $options = [];
-            $isCorrect = true;
-            foreach ($question['options'] as $option) {
-                $options[] = new Option($option, $isCorrect);
-                $isCorrect = false;
-            }
-
-            $game->addQuestion(new Question($question['title'], $options));
-            $numQuestions++;
-            if ($numQuestions >= $questions) {
-                break;
-            }
-        }
-
-        return $game;
+        return $this->quizProvider->createGame($numberQuestions);
     }
 
 }
